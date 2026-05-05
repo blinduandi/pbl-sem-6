@@ -7,26 +7,26 @@
 
     { "type": "wokwi-dht22", "id": "dht", "top": -200, "left": -260, "attrs": {} },
 
-    { "type": "wokwi-potentiometer", "id": "gas", "top": 60, "left": -260,
+    { "type": "wokwi-potentiometer", "id": "gas", "top": 80, "left": -290,
       "attrs": { "value": "0" } },
 
-    { "type": "wokwi-ssd1306", "id": "oled", "top": -200, "left": 220,
+    { "type": "wokwi-ssd1306", "id": "oled", "top": -210, "left": 180,
       "attrs": { "i2cAddress": "0x3c" } },
 
-    { "type": "wokwi-led", "id": "ledFan", "top": 240, "left": -120,
+    { "type": "wokwi-led", "id": "ledFan", "top": 250, "left": -180,
       "attrs": { "color": "red", "label": "FAN" } },
-    { "type": "wokwi-led", "id": "ledHum", "top": 240, "left": -20,
+    { "type": "wokwi-led", "id": "ledHum", "top": 250, "left": -80,
       "attrs": { "color": "blue", "label": "HUM" } },
 
-    { "type": "wokwi-buzzer", "id": "buzzer", "top": 220, "left": 100,
+    { "type": "wokwi-buzzer", "id": "buzzer", "top": 240, "left": 30,
       "attrs": { "volume": "0.1" } },
 
-    { "type": "wokwi-servo", "id": "window", "top": 60, "left": 220,
+    { "type": "wokwi-servo", "id": "window", "top": 250, "left": 200,
       "attrs": { "hornColor": "white" } },
 
-    { "type": "wokwi-resistor", "id": "rFan", "top": 195, "left": -130,
+    { "type": "wokwi-resistor", "id": "rFan", "top": 205, "left": -190,
       "attrs": { "value": "220" } },
-    { "type": "wokwi-resistor", "id": "rHum", "top": 195, "left": -30,
+    { "type": "wokwi-resistor", "id": "rHum", "top": 205, "left": -90,
       "attrs": { "value": "220" } }
   ],
   "connections": [
