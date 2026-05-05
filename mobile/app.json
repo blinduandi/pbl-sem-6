@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Room Manager",
+    "slug": "room-manager",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#171717"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.roommanager.app"
+    },
+    "android": {
+      "package": "com.roommanager.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#171717"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "backgroundColor": "#171717",
+    "primaryColor": "#3ecf8e"
+  }
+}

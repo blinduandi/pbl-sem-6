@@ -1,0 +1,18 @@
+{
+  "name": "room-manager",
+  "private": true,
+  "version": "0.1.0",
+  "description": "IoT Room Manager — ESP32 indoor air quality monitor with web + mobile dashboards",
+  "scripts": {
+    "dev:web": "npm --prefix web run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:mobile": "npm --prefix mobile start",
+    "dev": "concurrently -n backend,web -c green,cyan \"npm:dev:backend\" \"npm:dev:web\"",
+    "bridge:demo": "npm --prefix bridge run demo",
+    "bridge:serial": "npm --prefix bridge run serial -- --port COM3",
+    "install:all": "npm install && npm --prefix backend install && npm --prefix web install && npm --prefix mobile install && npm --prefix bridge install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

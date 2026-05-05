@@ -1,0 +1,8 @@
+# Wokwi VS Code extension config.
+# Build the firmware with `pio run` first — Wokwi reads the binaries
+# from the standard PlatformIO output directory.
+
+[wokwi]
+version = 1
+firmware = '.pio/build/megaatmega2560/firmware.hex'
+elf      = '.pio/build/megaatmega2560/firmware.elf'

@@ -1,0 +1,61 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.online {
+  color: var(--brand-green);
+  border-color: var(--brand-green-border);
+  background: var(--brand-green-glow);
+}
+
+.online .dot {
+  background: var(--brand-green);
+  box-shadow: 0 0 6px var(--brand-green);
+}
+
+.warning {
+  color: var(--warning);
+  border-color: rgba(245, 165, 36, 0.3);
+  background: rgba(245, 165, 36, 0.08);
+}
+
+.warning .dot {
+  background: var(--warning);
+}
+
+.danger {
+  color: var(--danger);
+  border-color: rgba(229, 72, 77, 0.3);
+  background: rgba(229, 72, 77, 0.1);
+}
+
+.danger .dot {
+  background: var(--danger);
+}
+
+.offline {
+  color: var(--text-muted);
+}
+
+.offline .dot {
+  background: var(--text-muted);
+}

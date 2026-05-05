@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "author": "Room Manager · Team 5",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-mega", "id": "mega", "top": 0, "left": 0, "attrs": {} },
+
+    { "type": "wokwi-dht22", "id": "dht", "top": -200, "left": -260, "attrs": {} },
+
+    { "type": "wokwi-potentiometer", "id": "gas", "top": 60, "left": -260,
+      "attrs": { "value": "0" } },
+
+    { "type": "wokwi-ssd1306", "id": "oled", "top": -200, "left": 220,
+      "attrs": { "i2cAddress": "0x3c" } },
+
+    { "type": "wokwi-led", "id": "ledFan", "top": 240, "left": -120,
+      "attrs": { "color": "red", "label": "FAN" } },
+    { "type": "wokwi-led", "id": "ledHum", "top": 240, "left": -20,
+      "attrs": { "color": "blue", "label": "HUM" } },
+
+    { "type": "wokwi-buzzer", "id": "buzzer", "top": 220, "left": 100,
+      "attrs": { "volume": "0.1" } },
+
+    { "type": "wokwi-resistor", "id": "rFan", "top": 195, "left": -130,
+      "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rHum", "top": 195, "left": -30,
+      "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "mega:GND.1", "dht:GND",  "black",  [] ],
+    [ "mega:5V",    "dht:VCC",  "red",    [] ],
+    [ "mega:7",     "dht:SDA",  "green",  [] ],
+
+    [ "mega:GND.2", "gas:GND",  "black",  [] ],
+    [ "mega:5V",    "gas:VCC",  "red",    [] ],
+    [ "mega:A0",    "gas:SIG",  "yellow", [] ],
+
+    [ "mega:20",    "oled:SDA", "blue",   [] ],
+    [ "mega:21",    "oled:SCL", "yellow", [] ],
+    [ "mega:GND.1", "oled:GND", "black",  [] ],
+    [ "mega:5V",    "oled:VCC", "red",    [] ],
+
+    [ "mega:6",     "rFan:1",     "green", [] ],
+    [ "rFan:2",     "ledFan:A",   "green", [] ],
+    [ "ledFan:C",   "mega:GND.1", "black", [] ],
+
+    [ "mega:5",     "rHum:1",     "green", [] ],
+    [ "rHum:2",     "ledHum:A",   "green", [] ],
+    [ "ledHum:C",   "mega:GND.2", "black", [] ],
+
+    [ "mega:9",     "buzzer:1",   "purple", [] ],
+    [ "buzzer:2",   "mega:GND.2", "black",  [] ]
+  ],
+  "dependencies": {}
+}

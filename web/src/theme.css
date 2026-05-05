@@ -1,0 +1,217 @@
+:root {
+  /* Surfaces */
+  --bg-page: #171717;
+  --bg-surface: #1c1c1c;
+  --bg-elevated: #202020;
+  --bg-button: #0f0f0f;
+
+  /* Text */
+  --text-primary: #fafafa;
+  --text-secondary: #b4b4b4;
+  --text-muted: #898989;
+
+  /* Borders */
+  --border-subtle: #242424;
+  --border-default: #2e2e2e;
+  --border-prominent: #363636;
+
+  /* Brand */
+  --brand-green: #3ecf8e;
+  --brand-green-link: #00c573;
+  --brand-green-border: rgba(62, 207, 142, 0.3);
+  --brand-green-glow: rgba(62, 207, 142, 0.12);
+
+  /* Semantic */
+  --warning: #f5a524;
+  --danger: #e5484d;
+  --info: #5b8bf7;
+
+  /* Type */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Source Code Pro', Menlo, monospace;
+
+  /* Layout */
+  --shell-max: 1280px;
+  --nav-height: 64px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.hero-h1 {
+  font-size: 72px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+.section-h2 {
+  font-size: 36px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+.card-h3 {
+  font-size: 24px;
+  line-height: 1.33;
+  letter-spacing: -0.16px;
+  font-weight: 400;
+}
+
+a {
+  color: var(--brand-green-link);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+a:hover {
+  color: var(--brand-green);
+}
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  border: none;
+  padding: 0;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 120ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--brand-green-border);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 8px;
+  border: 2px solid var(--bg-page);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-prominent);
+}
+
+/* Pill button primitives */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 32px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  background: var(--bg-button);
+  border: 1px solid var(--text-primary);
+  color: var(--text-primary);
+  transition: opacity 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.pill:hover {
+  opacity: 0.85;
+}
+
+.pill-secondary {
+  background: var(--bg-button);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  opacity: 0.8;
+}
+
+.pill-secondary:hover {
+  opacity: 1;
+  border-color: var(--border-prominent);
+}
+
+.pill-ghost {
+  background: transparent;
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  padding: 6px 16px;
+}
+
+.pill-ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--border-prominent);
+}
+
+/* Card primitive */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.card-lg {
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.tech-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
