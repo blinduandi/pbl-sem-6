@@ -22,12 +22,13 @@ without a real flame).
 | 8 | 220 Ω resistor | 2 | Current limiter for each LED |
 | 9 | Active piezo buzzer | 1 | Passive piezo also fine — the firmware uses `tone()` |
 | 10 | Breadboard + jumper wires | 1 set | Or perfboard + soldered headers |
-| 11 | 5 V DC supply, ≥ 1 A (USB phone charger) | 1 | Powers the **servo only** — see §5 |
-| 12 | USB-B cable | 1 | Powers + flashes the Mega |
+| 11 | USB-B cable | 1 | Powers + flashes the Mega — and powers everything else, including the servo |
+| 12 | 470 µF electrolytic capacitor | 1 *(optional)* | Across the breadboard 5 V/GND rails near the servo. Soaks up the SG90's start-up current spike so the Mega doesn't brown-out. Skip it on a quick demo; add it if the LCD glitches when the servo moves. |
 
-No relays and no separate 12 V supply: the project uses LEDs as
-visual stand-ins for the fan and humidifier, so all logic-level
-outputs drive LEDs through a 220 Ω resistor.
+No relays, no separate 12 V supply, **no external servo PSU**: the
+SG90 runs from the Mega's onboard 5 V regulator. The fan and
+humidifier are represented by LEDs (220 Ω current limiters), and the
+whole project is powered through the Mega's USB cable.
 
 ---
 
@@ -43,12 +44,11 @@ top of `sketch.ino`.
 | Humidifier LED | D5 | LED anode (via 220 Ω) | LED cathode → GND |
 | Fan LED | D6 | LED anode (via 220 Ω) | LED cathode → GND |
 | Buzzer | D9 | Buzzer `+` | `tone()` uses Timer 2; no other timer-2 PWM is used |
-| Window servo PWM | D10 | Servo orange/yellow signal | Servo lib uses Timer 5 on Mega — no clash with `tone()` |
+| Window servo PWM | D10 | Servo yellow (signal) | Servo lib uses Timer 5 on Mega — no clash with `tone()` |
 | LCD SDA | D20 (SDA) | LCD `SDA` | Hardware I²C — do not move |
 | LCD SCL | D21 (SCL) | LCD `SCL` | Hardware I²C — do not move |
-| 5 V rail | 5V | DHT11 VCC, LCD VCC, MQ-2 VCC | Mega's onboard regulator handles these comfortably |
-| Servo 5 V | external 5 V | Servo red | **Do not** power the servo from the Mega 5 V — see §5 |
-| Ground | GND (any) | Every component | Common ground tied to the external 5 V supply too |
+| 5 V rail | 5V | DHT11 VCC, LCD VCC, MQ-2 VCC, Servo red | All loads share the Mega's onboard regulator — see §5 for the SG90 caveat |
+| Ground | GND (any) | Every component | Common ground rail (servo brown included) |
 
 ---
 
@@ -59,8 +59,8 @@ only use the rails on **one** side of the board — the other side is
 just for spacing.
 
 ```
-  Top rail    (red strip):   +5V from the Mega
-  Bottom rail (blue strip):  GND from the Mega + servo PSU GND
+  Top rail    (red strip):   +5V from the Mega — feeds every component
+  Bottom rail (blue strip):  GND from the Mega — common ground for everything
 
   Mid columns:
     cols  1– 5   DHT11
@@ -68,6 +68,7 @@ just for spacing.
     cols 15–17   FAN LED + 220 Ω
     cols 19–21   HUM LED + 220 Ω
     cols 24–25   Buzzer
+    cols 27–28   470 µF cap (optional, near the servo leads)
     LCD + servo: wired off-board with female-male jumpers
 ```
 
@@ -80,7 +81,7 @@ leads — both are bulky.
 ## 4. Step-by-Step Wiring
 
 **Do every step with the Mega unplugged from USB.** Plug it in only
-at step 30. Use the colours below — they make later debugging
+at step 28. Use the colours below — they make later debugging
 trivial. Each step is one wire.
 
 ### A · Power rails (steps 1–4)
@@ -155,57 +156,72 @@ top).
 | 21 | Buzzer `+` | Mega `D9` | purple |
 | 22 | Buzzer `−` | Breadboard `−` rail | black |
 
-### H · Servo SG90 — steps 23–26
+### H · Servo SG90 — steps 23–25
 
-**Critical:** the servo is powered from the **external 5 V supply**,
-not the Mega. You only share the *signal* with the Mega; the power
-and ground come from the phone-charger PSU.
+The SG90 has 3 wires: **brown = GND, red = +5 V, yellow = signal**.
+We power it from the Mega's 5 V rail (no external PSU). If the LCD
+glitches or the Mega resets when the servo moves, drop in the 470 µF
+cap from the BoM across the `+`/`−` rails right next to the servo's
+red/brown leads — see §5.
 
 | # | From | To | Wire |
 |---|------|----|------|
-| 23 | Servo brown (GND) | External 5 V PSU `−` | black |
-| 24 | Servo red (VCC) | External 5 V PSU `+` | red |
-| 25 | Servo orange/yellow (signal) | Mega `D10` | orange |
-| 26 | External 5 V PSU `−` | Breadboard `−` rail | black (this ties the two grounds together — without it the servo will twitch) |
+| 23 | Servo brown (GND) | Breadboard `−` rail | brown |
+| 24 | Servo red (VCC) | Breadboard `+` rail | red |
+| 25 | Servo yellow (signal) | Mega `D10` | yellow |
 
-### I · Bring-up — steps 27–32
+### I · Bring-up — steps 26–30
 
 | # | Action |
 |---|--------|
-| 27 | Double-check **all** GND lines reach the same `−` rail. |
-| 28 | Confirm no wire goes from the Mega `5V` pin to the servo. |
-| 29 | Plug the external 5 V supply into the wall. The servo should snap to 0° (closed position). |
-| 30 | Plug the Mega's USB into the PC. Green PWR LED on the Mega lights up. |
-| 31 | LCD shows `Room Manager` on row 0, `v1.4.2-mega` on row 1, then switches to `T:.. H:.. G:..` after ~2 s. |
-| 32 | If the LCD backlight is on but text is missing, turn the small blue trim-pot on the I²C backpack until the characters appear. If the screen is completely dead, your backpack is at `0x3F` — flip `LCD_ADDR` in `sketch.ino` and re-flash. |
+| 26 | Double-check **all** GND lines reach the same `−` rail (Mega GND, every sensor's GND, both LED cathodes, buzzer `−`, servo brown). |
+| 27 | Confirm the servo red goes to the breadboard `+` rail (which is fed by Mega `5V`), not somewhere weird. |
+| 28 | Plug the Mega's USB into the PC. Green PWR LED on the Mega lights up. The servo should snap to 0° (closed position). |
+| 29 | LCD shows `Room Manager` on row 0, `v1.4.2-mega` on row 1, then switches to `T:.. H:.. G:..` after ~2 s. |
+| 30 | If the LCD backlight is on but text is missing, turn the small blue trim-pot on the I²C backpack until the characters appear. If the screen is completely dead, your backpack is at `0x3F` — flip `LCD_ADDR` in `sketch.ino` and re-flash. |
 
-### J · Smoke test — steps 33–36
+### J · Smoke test — steps 31–34
 
 | # | Action | Expected |
 |---|--------|----------|
-| 33 | Breathe on the DHT11 for 5 s. | Humidity rises past 60 → red FAN LED on, servo rotates to 90° (open). |
-| 34 | Stop breathing, wait. | Humidity falls below 55 → FAN LED off, servo back to 0°. |
-| 35 | With sensor in dry room (or no breath), wait. | If RH < 40, blue HUM LED on. |
-| 36 | Hold a lit match ~30 cm from the MQ-2. | Buzzer pulses at ~1 Hz, FAN LED forced on, servo opens. Reading on row 0 climbs past 300 ppm. |
+| 31 | Breathe on the DHT11 for 5 s. | Humidity rises past 60 → red FAN LED on, servo rotates to 90° (open). |
+| 32 | Stop breathing, wait. | Humidity falls below 55 → FAN LED off, servo back to 0°. |
+| 33 | With sensor in dry room (or no breath), wait. | If RH < 40, blue HUM LED on. |
+| 34 | Hold a lit match ~30 cm from the MQ-2. | Buzzer pulses at ~1 Hz, FAN LED forced on, servo opens. Reading on row 0 climbs past 300 ppm. |
 
 If any step misbehaves, open the serial monitor at 9600 baud — the
 firmware emits a JSON line every 2 s with all four state booleans
-plus the raw readings.
+plus the raw readings. If the **Mega keeps resetting** when the
+servo moves, that's a brown-out — drop in the 470 µF cap from §5.
 
 ---
 
-## 5. Why the Servo Needs Its Own 5 V
+## 5. Powering the Servo from the Mega 5 V
 
-An SG90 draws ~ 100 mA at idle and can spike to **600–800 mA** during
-movement or stall. The Mega's onboard 5 V regulator is rated for about
-500 mA total and is already shared by the LCD, DHT11 and MQ-2.
-Powering the servo from the Mega will brown-out the rail, reset the
-MCU mid-loop, and produce intermittent LCD corruption.
+The SG90 only draws about 10 mA at idle and ~ 100–200 mA during a
+small angle change like ours (0° → 90°, no load on the horn). That's
+within what the Mega's onboard 5 V regulator can spare, so we just
+share the rail with the LCD, DHT11, and MQ-2.
 
-The fix is a small dedicated 5 V supply (a phone charger via a USB
-breakout works fine). Wire its + to the servo red, its − to the servo
-brown, and tie that − to the Mega GND so the PWM signal has a common
-reference. Do **not** connect its + to the Mega's 5 V pin.
+There is one failure mode to know about. The instant the servo
+starts moving it can spike to **600–800 mA** for a few milliseconds,
+and that spike can drop the 5 V rail enough to reset the MCU. You
+will see this as:
+
+- The Mega rebooting (LCD splash screen reappears) every time the
+  servo moves.
+- The LCD showing garbage characters that only clear with a power
+  cycle.
+- The buzzer cutting out mid-pulse.
+
+If any of those happen, fit the 470 µF electrolytic capacitor from
+the BoM **across the breadboard `+`/`−` rails as close to the servo
+red/brown leads as you can get it**. Mind the polarity — the
+striped (negative) leg goes to the `−` rail. The capacitor stores
+enough charge to ride out the spike, and the rail stops sagging.
+
+For a clean, demo-grade build you would still use a separate 5 V
+supply. For this project's quick bench test the cap is enough.
 
 ---
 
@@ -238,9 +254,9 @@ for the current firmware.
 - **LCD I²C pull-ups:** the PCF8574 backpack ships with 4.7 kΩ
   pull-ups on SDA/SCL — do not add more.
 - **Power decoupling:** put a 100 nF ceramic capacitor across the 5 V
-  rail close to the LCD, and a 470 µF electrolytic close to the
-  servo's external 5 V supply. Both are insurance against the
-  brown-outs that ruin a long demo.
+  rail close to the LCD, and the 470 µF electrolytic from the BoM
+  next to the servo's red/brown leads (see §5). Both are insurance
+  against the brown-outs that ruin a long demo.
 
 ---
 
@@ -293,7 +309,7 @@ not flicker on every 2 s sample.
 | `wokwi-potentiometer` on A0 | MQ-2 module's AOUT (with calibration) |
 | `wokwi-led` × 2 (FAN, HUM) | 5 mm LEDs through 220 Ω resistors |
 | `wokwi-buzzer` | Active piezo, same wiring |
-| `wokwi-servo` | SG90 with **separate** 5 V supply |
+| `wokwi-servo` | SG90 (3 wires: brown/red/yellow) on the Mega 5 V rail |
 | `wokwi-dht22` | DHT11 4-pin module — both speak the same single-wire protocol; the firmware uses `DHT11` driver type |
 | `wokwi-lcd1602` (I²C mode) | 16x2 LCD with PCF8574 I²C backpack at 0x27 |
 | `wokwi-arduino-mega` | Real Mega 2560 |
