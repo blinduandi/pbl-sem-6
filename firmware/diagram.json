@@ -21,6 +21,9 @@
     { "type": "wokwi-buzzer", "id": "buzzer", "top": 220, "left": 100,
       "attrs": { "volume": "0.1" } },
 
+    { "type": "wokwi-servo", "id": "window", "top": 60, "left": 220,
+      "attrs": { "hornColor": "white" } },
+
     { "type": "wokwi-resistor", "id": "rFan", "top": 195, "left": -130,
       "attrs": { "value": "220" } },
     { "type": "wokwi-resistor", "id": "rHum", "top": 195, "left": -30,
@@ -49,7 +52,11 @@
     [ "ledHum:C",   "mega:GND.2", "black", [] ],
 
     [ "mega:9",     "buzzer:1",   "purple", [] ],
-    [ "buzzer:2",   "mega:GND.2", "black",  [] ]
+    [ "buzzer:2",   "mega:GND.2", "black",  [] ],
+
+    [ "mega:10",    "window:PWM", "orange", [] ],
+    [ "mega:5V",    "window:V+",  "red",    [] ],
+    [ "window:GND", "mega:GND.1", "black",  [] ]
   ],
   "dependencies": {}
 }

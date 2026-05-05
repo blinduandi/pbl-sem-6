@@ -18,6 +18,7 @@
 #include <DHT.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <Servo.h>
 
 // ---- Inlined config (firmware/include/config.h) ----------------------
 // =====================================================================
@@ -51,6 +52,13 @@
 // Any digital pin works; pin 9 keeps the buzzer away from the timers
 // the Adafruit graphics libraries occasionally touch.
 #define PIN_BUZZER       9
+
+// Servo driving the motorised window vent. The Servo library on the
+// Mega claims Timer 5 by default, which doesn't collide with tone()
+// (Timer 2) or the Wire/Adafruit stack.
+#define PIN_WINDOW       10
+constexpr int WINDOW_CLOSED_DEG = 0;
+constexpr int WINDOW_OPEN_DEG   = 90;
 
 // I²C bus for the SSD1306 OLED uses the Mega's hardware TWI pins:
 // SDA = 20, SCL = 21 (no manual definition needed — Wire library
@@ -92,6 +100,7 @@ constexpr uint8_t SCREEN_H = 64;
 
 DHT dht(PIN_DHT, DHT22);
 Adafruit_SSD1306 display(SCREEN_W, SCREEN_H, &Wire, -1);
+Servo windowServo;
 
 // ---- Runtime state --------------------------------------------------
 struct State {
@@ -102,6 +111,7 @@ struct State {
   bool  fanOn         = false;
   bool  humidifierOn  = false;
   bool  alarmOn       = false;
+  bool  windowOpen    = false;
   bool  dhtValid      = false;
   unsigned long uptimeS = 0;
 };
@@ -164,6 +174,10 @@ void applyHysteresis() {
 
   // Force-vent on alarm: get the air moving regardless of RH.
   if (state.alarmOn) state.fanOn = true;
+
+  // Window follows ventilation demand — open whenever the fan runs
+  // (high RH) or the gas alarm is latched.
+  state.windowOpen = state.fanOn || state.alarmOn;
 }
 
 // =====================================================================
@@ -172,6 +186,7 @@ void applyHysteresis() {
 void driveActuators(unsigned long now) {
   digitalWrite(PIN_FAN,        state.fanOn        ? HIGH : LOW);
   digitalWrite(PIN_HUMIDIFIER, state.humidifierOn ? HIGH : LOW);
+  windowServo.write(state.windowOpen ? WINDOW_OPEN_DEG : WINDOW_CLOSED_DEG);
 
   // Buzzer — pulse 50% duty at ~1 Hz while the alarm latch is set.
   if (state.alarmOn) {
@@ -224,11 +239,13 @@ void renderDisplay() {
   display.drawLine(0, 47, SCREEN_W - 1, 47, SSD1306_WHITE);
   display.setCursor(0, 52);
   display.print(F("F:"));
-  display.print(state.fanOn ? F("ON ") : F("off"));
+  display.print(state.fanOn ? F("ON") : F("OF"));
   display.print(F(" H:"));
-  display.print(state.humidifierOn ? F("ON ") : F("off"));
+  display.print(state.humidifierOn ? F("ON") : F("OF"));
   display.print(F(" A:"));
-  display.print(state.alarmOn ? F("ON") : F("off"));
+  display.print(state.alarmOn ? F("ON") : F("OF"));
+  display.print(F(" W:"));
+  display.print(state.windowOpen ? F("OP") : F("CL"));
 
   display.display();
 }
@@ -250,6 +267,10 @@ void setup() {
   pinMode(PIN_BUZZER, OUTPUT);
   digitalWrite(PIN_FAN, LOW);
   digitalWrite(PIN_HUMIDIFIER, LOW);
+
+  // Window servo — start closed.
+  windowServo.attach(PIN_WINDOW);
+  windowServo.write(WINDOW_CLOSED_DEG);
 
   // OLED
   Wire.begin();
@@ -293,6 +314,7 @@ void loop() {
     Serial.print(F(",\"fanOn\":"));         Serial.print(state.fanOn ? F("true") : F("false"));
     Serial.print(F(",\"humidifierOn\":"));  Serial.print(state.humidifierOn ? F("true") : F("false"));
     Serial.print(F(",\"alarmOn\":"));       Serial.print(state.alarmOn ? F("true") : F("false"));
+    Serial.print(F(",\"windowOpen\":"));    Serial.print(state.windowOpen ? F("true") : F("false"));
     Serial.print(F(",\"uptime\":"));        Serial.print(state.uptimeS);
     Serial.println(F("}"));
   }
