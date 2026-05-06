@@ -91,8 +91,6 @@ class TelemetryStore {
 
   private seedDevices(): void {
     const livingBaseline = { humidity: 48, temperature: 22.5, gas: 110 };
-    const bedroomBaseline = { humidity: 52, temperature: 21.8, gas: 95 };
-    const basementBaseline = { humidity: 58, temperature: 19.5, gas: 130 };
 
     const now = Date.now();
     const seeds: DeviceSeed[] = [
@@ -103,26 +101,6 @@ class TelemetryStore {
         actuators: { fanOn: false, humidifierOn: false, alarmOn: false },
         history: [],
         nextEventAt: now + nextEventDelay(),
-        activeEvent: null,
-        eventEndsAt: 0,
-      },
-      {
-        device: makeDevice('rm-bedroom', 'Bedroom', 'Second floor • East', '1.4.2'),
-        baseline: bedroomBaseline,
-        state: { ...bedroomBaseline, wifiRssi: -61 },
-        actuators: { fanOn: false, humidifierOn: false, alarmOn: false },
-        history: [],
-        nextEventAt: now + 18_000, // first humidity spike soon-ish
-        activeEvent: null,
-        eventEndsAt: 0,
-      },
-      {
-        device: makeDevice('rm-basement', 'Basement', 'Below ground • Utility', '1.4.0'),
-        baseline: basementBaseline,
-        state: { ...basementBaseline, wifiRssi: -72 },
-        actuators: { fanOn: false, humidifierOn: false, alarmOn: false },
-        history: [],
-        nextEventAt: now + 30_000, // first gas spike
         activeEvent: null,
         eventEndsAt: 0,
       },

@@ -5,6 +5,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 
 import { Store } from './store.js';
 import { TelemetrySimulator } from './simulator.js';
+import { DEFAULT_PROFILES } from './profiles.js';
 import { buildRouter } from './routes.js';
 import { sanitiseThresholdPatch } from './thresholds.js';
 import { validateAndMergeIngest } from './ingest.js';
@@ -21,6 +22,10 @@ import type {
 
 const PORT = Number(process.env.PORT ?? 4000);
 const SEED = process.env.SEED ? Number(process.env.SEED) : undefined;
+// LIVE_ONLY=1 → register only the live Arduino device and skip the random-walk
+// simulator so dashboards never show synthetic data.
+const LIVE_ONLY = process.env.LIVE_ONLY === '1';
+const LIVE_DEVICE_ID = process.env.LIVE_DEVICE_ID ?? 'rm-living';
 
 function ts(): string {
   return new Date().toISOString();
@@ -35,7 +40,10 @@ function log(level: 'info' | 'warn' | 'error', msg: string, extra?: unknown): vo
 }
 
 const store = new Store([]);
-const simulator = new TelemetrySimulator(store, undefined, SEED);
+const simulatorProfiles = LIVE_ONLY
+  ? DEFAULT_PROFILES.filter((p) => p.device.id === LIVE_DEVICE_ID)
+  : DEFAULT_PROFILES;
+const simulator = new TelemetrySimulator(store, simulatorProfiles, SEED);
 
 /**
  * Validate + apply an ingest payload from any transport (WS or REST).
@@ -161,8 +169,15 @@ server.listen(PORT, () => {
     http: `http://localhost:${PORT}/api`,
     ws: `ws://localhost:${PORT}/ws`,
     seed: SEED ?? 'random',
+    liveOnly: LIVE_ONLY,
   });
-  simulator.start();
+  if (LIVE_ONLY) {
+    log('info', 'simulator disabled (LIVE_ONLY=1) — waiting for bridge ingest', {
+      device: LIVE_DEVICE_ID,
+    });
+  } else {
+    simulator.start();
+  }
 });
 
 function shutdown(signal: NodeJS.Signals): void {

@@ -155,6 +155,12 @@ function parseLine(
   if (temperature !== undefined) out.temperature = temperature;
   const gas = num('gas');
   if (gas !== undefined) out.gas = gas;
+  else {
+    // Mega firmware emits gasPct (0–100 %); backend expects gas in ppm-equivalent.
+    // 30 % ≈ 300 ppm per firmware threshold comment, so scale ×10.
+    const gasPct = num('gasPct');
+    if (gasPct !== undefined) out.gas = gasPct * 10;
+  }
   const fanOn = bool('fanOn');
   if (fanOn !== undefined) out.fanOn = fanOn;
   const humidifierOn = bool('humidifierOn');

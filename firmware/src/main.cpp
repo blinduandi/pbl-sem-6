@@ -32,10 +32,10 @@
 // =====================================================================
 
 // ---- Pin map (Arduino Mega 2560) -------------------------------------
-// DHT11 single-wire data — pin 22 (plain digital on the Mega's 22-53 header,
-// pure GPIO, no timer, no interrupt, no conflict with Servo/tone/I2C).
-// Needs a 4.7–10 kΩ pull-up to 5 V if using a bare 3-pin sensor.
-#define PIN_DHT          22
+// DHT11 single-wire data — pin 7 (plain digital, no timer / interrupt /
+// I²C conflict). Needs a 4.7–10 kΩ pull-up to 5 V if using a bare 3-pin
+// sensor; 4-pin modules already have it onboard.
+#define PIN_DHT          7
 
 // MQ-2 analog out → A0 (10-bit ADC, 0..1023).
 // In Wokwi this pin is driven by a potentiometer that simulates rising
@@ -140,11 +140,13 @@ int  gasRawAdc = 0; // stored for JSON diagnostics
 // SENSE
 // =====================================================================
 void readDht() {
-  // force=true bypasses the 2000 ms MIN_INTERVAL cache.
-  // Without it, if the loop fires 1 ms early the library returns the last
-  // NaN result instead of attempting a fresh read.
-  const float h = dht.readHumidity(true);
-  const float t = dht.readTemperature(false, true);
+  // ONE forced read per sample, then pull cached values. Calling
+  // readHumidity(true) and readTemperature(true) back-to-back triggers
+  // two full handshakes ~25 ms apart, which the DHT11 can't service —
+  // it needs ≥1 s between reads, so the second one always returns NaN.
+  dht.read(true);
+  const float h = dht.readHumidity();    // cached, no force
+  const float t = dht.readTemperature(); // cached, no force
   state.dhtValid = !isnan(h) && !isnan(t);
   if (state.dhtValid) {
     lastValidHumidity = h;

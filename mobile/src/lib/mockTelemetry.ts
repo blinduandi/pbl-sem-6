@@ -62,36 +62,6 @@ const initialDevices: DeviceProfile[] = [
     actuators: { fanOn: false, humidifierOn: false, alarmOn: false },
     injection: { type: 'none', until: 0 },
   },
-  {
-    device: {
-      id: 'rm-bedroom',
-      name: 'Bedroom',
-      location: 'First floor · west wall',
-      status: 'online',
-      firmware: '1.4.2',
-      lastSeen: isoNow(),
-    },
-    baseline: { humidity: 51, temperature: 21.8, gas: 95 },
-    noise: { humidity: 1.4, temperature: 0.22, gas: 11 },
-    history: [],
-    actuators: { fanOn: false, humidifierOn: false, alarmOn: false },
-    injection: { type: 'none', until: 0 },
-  },
-  {
-    device: {
-      id: 'rm-basement',
-      name: 'Basement',
-      location: 'Below grade · utility',
-      status: 'online',
-      firmware: '1.3.9',
-      lastSeen: isoNow(),
-    },
-    baseline: { humidity: 54, temperature: 19.4, gas: 130 },
-    noise: { humidity: 1.6, temperature: 0.18, gas: 22 },
-    history: [],
-    actuators: { fanOn: false, humidifierOn: false, alarmOn: false },
-    injection: { type: 'none', until: 0 },
-  },
 ];
 
 const ALERT_MESSAGES: Record<AlertType, string> = {
